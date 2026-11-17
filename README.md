@@ -2,7 +2,7 @@
 
 ## Descargar
 
-[Descargar ULTRA.apk](https://github.com/ivanrodriguez-dozur/ultra-android-downloads/releases/latest/download/ULTRA.apk)
+[Descargar ULTRA.apk](https://ultrafuture.co/app)
 
 La descarga es pública y no requiere invitación ni cuenta de Firebase. Abre la
 APK descargada y confirma su instalación en Android. Puede aparecer una solicitud
