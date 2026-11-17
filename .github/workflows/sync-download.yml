@@ -1,0 +1,42 @@
+name: Actualizar descarga publica de ULTRA
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+permissions:
+  contents: write
+  id-token: write
+concurrency:
+  group: ultra-public-download
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/619425768506/locations/global/workloadIdentityPools/github-ultra/providers/github
+          service_account: ultra-downloads-reader@ultra-pruebas-android.iam.gserviceaccount.com
+          token_format: access_token
+      - name: Consultar la ultima beta
+        id: beta
+        env:
+          FIREBASE_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          GH_TOKEN: ${{ github.token }}
+        run: node download-latest.mjs
+      - name: Publicar la APK verificada
+        if: steps.beta.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.beta.outputs.tag }}
+          TITLE: ${{ steps.beta.outputs.title }}
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --draft --title "$TITLE" --notes-file public-artifacts/release-notes.txt
+          gh release upload "$TAG" public-artifacts/ULTRA.apk public-artifacts/version.json --clobber
+          gh release edit "$TAG" --draft=false --latest

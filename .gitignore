@@ -1,0 +1,6 @@
+public-artifacts/
+gha-creds-*.json
+*.apk
+*.keystore
+*.jks
+.env*
